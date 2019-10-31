@@ -1,0 +1,4 @@
+Instalar los modulos:
+    npm i validator@10.8.0
+    npm i chalk
+    npm i nodemon@1.18.9 -g
