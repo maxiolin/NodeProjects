@@ -1,6 +1,10 @@
 const path = require('path');
+
 const express = require('express');
 const hbs = require('hbs');
+
+const geocode = require('./utils/geoCode.js');
+const forecast = require('./utils/forecast.js');
 
 const app = express()
 // Defined paths for Expressconfig
@@ -45,12 +49,51 @@ app.get('/about', (req, res) => {
     });
 })
 
+app.get('/products', (req, res) => {
+    if(!req.query.search) {
+        res.send({
+            error: 'You must provide a search term'
+        })
+    }
+    else {
+        console.log(req.query.search)
+        res.send({
+            products: []
+        })
+    }
+})
+
 app.get('/weather', (req, res) => {
-    res.send({
-        location: "Zapopan, Jalisco, Mexico",
-        longitude: 70,
-        latitude: -15
+    if(!req.query.address) {
+       return res.send({
+            error: 'You must provide and adress'
+        })
+    }
+    
+    geocode(req.query.address , (error, {latitude, longitude, location} = {}) => {
+        if (error)
+            return res.send({
+                error
+            })
+            
+            
+            forecast(latitude, longitude, (error, data) => {
+            if (error)
+                return res.send({
+                    error
+                })
+            
+                
+                
+                res.send({
+                    forecast: data,
+                    location: location 
+                })
+            });
+    
     })
+
+    
 })
 
 app.get('/help/*', (req, res) => {
